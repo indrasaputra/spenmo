@@ -202,4 +202,13 @@ enum SpenmoCardErrorCode {
 
   // Card not found in system.
   NOT_FOUND = 4;
+
+  // Card's user is invalid.
+  INVALID_USER = 5;
+
+  // Card's wallet is invalid.
+  INVALID_WALLET = 6;
+
+  // Card's limit is invalid.
+  INVALID_LIMIT = 7;
 }

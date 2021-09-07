@@ -70,6 +70,60 @@ func ErrNotFound() error {
 	return res.Err()
 }
 
+// ErrInvalidUser returns codes.InvalidArgument explained that the instance's user is invalid.
+func ErrInvalidUser() error {
+	st := status.New(codes.InvalidArgument, "")
+	br := createBadRequest(&errdetails.BadRequest_FieldViolation{
+		Field:       "userId",
+		Description: "user is invalid",
+	})
+
+	te := &api.SpenmoCardError{
+		ErrorCode: api.SpenmoCardErrorCode_INVALID_USER,
+	}
+	res, err := st.WithDetails(br, te)
+	if err != nil {
+		return st.Err()
+	}
+	return res.Err()
+}
+
+// ErrInvalidWallet returns codes.InvalidArgument explained that the instance's wallet is invalid.
+func ErrInvalidWallet() error {
+	st := status.New(codes.InvalidArgument, "")
+	br := createBadRequest(&errdetails.BadRequest_FieldViolation{
+		Field:       "walletId",
+		Description: "wallet is invalid",
+	})
+
+	te := &api.SpenmoCardError{
+		ErrorCode: api.SpenmoCardErrorCode_INVALID_WALLET,
+	}
+	res, err := st.WithDetails(br, te)
+	if err != nil {
+		return st.Err()
+	}
+	return res.Err()
+}
+
+// ErrInvalidLimit returns codes.InvalidArgument explained that the instance's limit is invalid.
+func ErrInvalidLimit() error {
+	st := status.New(codes.InvalidArgument, "")
+	br := createBadRequest(&errdetails.BadRequest_FieldViolation{
+		Field:       "limit*",
+		Description: "limit is invalid. it must be greater than 0",
+	})
+
+	te := &api.SpenmoCardError{
+		ErrorCode: api.SpenmoCardErrorCode_INVALID_LIMIT,
+	}
+	res, err := st.WithDetails(br, te)
+	if err != nil {
+		return st.Err()
+	}
+	return res.Err()
+}
+
 func createBadRequest(details ...*errdetails.BadRequest_FieldViolation) *errdetails.BadRequest {
 	return &errdetails.BadRequest{
 		FieldViolations: details,

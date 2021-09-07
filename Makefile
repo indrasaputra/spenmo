@@ -29,6 +29,21 @@ test.cleancache:
 test.unit: test.cleancache
 	go test -v -race $(GO_UNIT_TEST_FILES)
 
+.PHONY: test.cover
+test.cover:
+	go test -v -race $(GO_UNIT_TEST_FILES) -coverprofile=coverage.out
+	go tool cover -html=coverage.out -o coverage.html
+	go tool cover -func coverage.out
+
+.PHONY: test.coverhtml
+test.coverhtml:
+	go test -v -race $(GO_UNIT_TEST_FILES) -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
+.PHONY: gen.mock
+gen.mock:
+	bin/generate-mock.sh
+
 .PHONY: gen.proto
 gen.proto:
 	bin/generate-proto.sh
