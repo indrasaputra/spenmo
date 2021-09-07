@@ -10,9 +10,12 @@ require (
 	github.com/indrasaputra/hashids v0.2.0
 	github.com/jackc/pgconn v1.10.0
 	github.com/jackc/pgx/v4 v4.13.0
+	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
+	github.com/joho/godotenv v1.3.0
 	github.com/opentracing-contrib/go-grpc v0.0.0-20210225150812-73cb765af46e
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pashagolub/pgxmock v1.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.13.0
