@@ -207,7 +207,7 @@ type CardQueryServiceClient interface {
 	//
 	// This endpoint gets a single card by its key.
 	// The user information is taken from authentication.
-	GetCardByKey(ctx context.Context, in *GetCardByKeyRequest, opts ...grpc.CallOption) (*GetCardByKeyResponse, error)
+	GetCardByID(ctx context.Context, in *GetCardByIDRequest, opts ...grpc.CallOption) (*GetCardByIDResponse, error)
 	// Get all user's cards.
 	//
 	// This endpoint gets all available user's cards in the system.
@@ -222,9 +222,9 @@ func NewCardQueryServiceClient(cc grpc.ClientConnInterface) CardQueryServiceClie
 	return &cardQueryServiceClient{cc}
 }
 
-func (c *cardQueryServiceClient) GetCardByKey(ctx context.Context, in *GetCardByKeyRequest, opts ...grpc.CallOption) (*GetCardByKeyResponse, error) {
-	out := new(GetCardByKeyResponse)
-	err := c.cc.Invoke(ctx, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey", in, out, opts...)
+func (c *cardQueryServiceClient) GetCardByID(ctx context.Context, in *GetCardByIDRequest, opts ...grpc.CallOption) (*GetCardByIDResponse, error) {
+	out := new(GetCardByIDResponse)
+	err := c.cc.Invoke(ctx, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ type CardQueryServiceServer interface {
 	//
 	// This endpoint gets a single card by its key.
 	// The user information is taken from authentication.
-	GetCardByKey(context.Context, *GetCardByKeyRequest) (*GetCardByKeyResponse, error)
+	GetCardByID(context.Context, *GetCardByIDRequest) (*GetCardByIDResponse, error)
 	// Get all user's cards.
 	//
 	// This endpoint gets all available user's cards in the system.
@@ -260,8 +260,8 @@ type CardQueryServiceServer interface {
 type UnimplementedCardQueryServiceServer struct {
 }
 
-func (UnimplementedCardQueryServiceServer) GetCardByKey(context.Context, *GetCardByKeyRequest) (*GetCardByKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCardByKey not implemented")
+func (UnimplementedCardQueryServiceServer) GetCardByID(context.Context, *GetCardByIDRequest) (*GetCardByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCardByID not implemented")
 }
 func (UnimplementedCardQueryServiceServer) GetAllCards(context.Context, *GetAllCardsRequest) (*GetAllCardsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllCards not implemented")
@@ -279,20 +279,20 @@ func RegisterCardQueryServiceServer(s grpc.ServiceRegistrar, srv CardQueryServic
 	s.RegisterService(&CardQueryService_ServiceDesc, srv)
 }
 
-func _CardQueryService_GetCardByKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCardByKeyRequest)
+func _CardQueryService_GetCardByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCardByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CardQueryServiceServer).GetCardByKey(ctx, in)
+		return srv.(CardQueryServiceServer).GetCardByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey",
+		FullMethod: "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CardQueryServiceServer).GetCardByKey(ctx, req.(*GetCardByKeyRequest))
+		return srv.(CardQueryServiceServer).GetCardByID(ctx, req.(*GetCardByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -323,8 +323,8 @@ var CardQueryService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CardQueryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetCardByKey",
-			Handler:    _CardQueryService_GetCardByKey_Handler,
+			MethodName: "GetCardByID",
+			Handler:    _CardQueryService_GetCardByID_Handler,
 		},
 		{
 			MethodName: "GetAllCards",

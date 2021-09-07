@@ -89,12 +89,12 @@
       "get": {
         "summary": "Get a card information.",
         "description": "This endpoint gets a single card by its key.\nThe user information is taken from authentication.",
-        "operationId": "CardQueryService_GetCardByKey",
+        "operationId": "CardQueryService_GetCardByID",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetCardByKeyResponse"
+              "$ref": "#/definitions/v1GetCardByIDResponse"
             }
           },
           "default": {
@@ -295,7 +295,7 @@
         }
       }
     },
-    "v1GetCardByKeyResponse": {
+    "v1GetCardByIDResponse": {
       "type": "object",
       "properties": {
         "card": {
