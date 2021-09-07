@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 // User defines logical data for user.
 type User struct {
 	// ID represents a unique identifier of user.
@@ -32,4 +34,11 @@ type UserCard struct {
 	LimitDaily float64
 	// LimitDaily represents monthly limit usage for the card.
 	LimitMonthly float64
+	// CreatedAt defines the time when the card was created.
+	CreatedAt time.Time
+	// UpdatedAt defines the time when the card was last updated.
+	UpdatedAt time.Time
+	// DeletedAt defines the time when the card was deleted.
+	// The type is pointer because when it needs to be nil if it isn't deleted.
+	DeletedAt *time.Time
 }

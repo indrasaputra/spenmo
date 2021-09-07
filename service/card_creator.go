@@ -25,9 +25,7 @@ type CardCreator struct {
 
 // NewCardCreator creates an instance of CardCreator.
 func NewCardCreator(repo CreateCardRepository) *CardCreator {
-	return &CardCreator{
-		repo: repo,
-	}
+	return &CardCreator{repo: repo}
 }
 
 // Create creates a new user's card and store it in the storage.
