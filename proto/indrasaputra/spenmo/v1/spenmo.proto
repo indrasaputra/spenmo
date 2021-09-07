@@ -184,9 +184,9 @@ message Card {
       [ (google.api.field_behavior) = OUTPUT_ONLY ];
 }
 
-message CardError { CardErrorCode error_code = 1; }
+message SpenmoCardError { SpenmoCardErrorCode error_code = 1; }
 
-enum CardErrorCode {
+enum SpenmoCardErrorCode {
   // Default enum code according to
   // https://medium.com/@akhaku/protobuf-definition-best-practices-87f281576f31.
   UNSPECIFIED = 0;
@@ -198,7 +198,7 @@ enum CardErrorCode {
   EMPTY_CARD = 2;
 
   // Card's id is invalid.
-  INVALID_KEY = 3;
+  INVALID_ID = 3;
 
   // Card not found in system.
   NOT_FOUND = 4;

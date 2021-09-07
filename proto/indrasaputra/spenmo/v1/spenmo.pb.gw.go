@@ -267,7 +267,7 @@ func RegisterCardCommandServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/CreateCard")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/CreateCard", runtime.WithHTTPPathPattern("/v1/users/cards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -290,7 +290,7 @@ func RegisterCardCommandServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/UpdateCard")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/UpdateCard", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -313,7 +313,7 @@ func RegisterCardCommandServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/DeleteCard")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/DeleteCard", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -345,7 +345,7 @@ func RegisterCardQueryServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -368,7 +368,7 @@ func RegisterCardQueryServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetAllCards")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetAllCards", runtime.WithHTTPPathPattern("/v1/users/cards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -430,7 +430,7 @@ func RegisterCardCommandServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/CreateCard")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/CreateCard", runtime.WithHTTPPathPattern("/v1/users/cards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -450,7 +450,7 @@ func RegisterCardCommandServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/UpdateCard")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/UpdateCard", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -470,7 +470,7 @@ func RegisterCardCommandServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/DeleteCard")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardCommandService/DeleteCard", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -547,7 +547,7 @@ func RegisterCardQueryServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetCardByKey", runtime.WithHTTPPathPattern("/v1/users/cards/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -567,7 +567,7 @@ func RegisterCardQueryServiceHandlerClient(ctx context.Context, mux *runtime.Ser
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetAllCards")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/proto.indrasaputra.spenmo.v1.CardQueryService/GetAllCards", runtime.WithHTTPPathPattern("/v1/users/cards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
