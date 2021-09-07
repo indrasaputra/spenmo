@@ -1,0 +1,62 @@
+package handler
+
+import (
+	"context"
+
+	"github.com/indrasaputra/hashids"
+
+	"github.com/indrasaputra/spenmo/entity"
+	api "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1"
+	"github.com/indrasaputra/spenmo/service"
+)
+
+// CardCommand handles HTTP/2 gRPC request for state-changing toggle .
+type CardCommand struct {
+	api.UnimplementedCardCommandServiceServer
+
+	creator service.CreateCard
+}
+
+// NewCardCommand creates an instance of CardCommand.
+func NewCardCommand(creator service.CreateCard) *CardCommand {
+	return &CardCommand{creator: creator}
+}
+
+// CreateCard handles HTTP/2 gRPC request similar to POST in HTTP/1.1.
+func (cc *CardCommand) CreateCard(ctx context.Context, request *api.CreateCardRequest) (*api.CreateCardResponse, error) {
+	if request == nil || request.GetCard() == nil {
+		return nil, entity.ErrEmptyCard()
+	}
+
+	// TODO: get from header
+	userID := int64(1)
+	walletID, err := hashids.DecodeHash([]byte(request.GetCard().GetWalletId()))
+	if err != nil {
+		return nil, entity.ErrInvalidWallet()
+	}
+
+	err = cc.creator.Create(ctx, createCardFromCreateCardRequest(request, userID, int64(walletID)))
+	if err != nil {
+		return nil, err
+	}
+	return &api.CreateCardResponse{}, nil
+}
+
+// UpdateCard handles HTTP/2 gRPC request similar to PUT in HTTP/1.1.
+func (cc *CardCommand) UpdateCard(ctx context.Context, request *api.UpdateCardRequest) (*api.UpdateCardResponse, error) {
+	return &api.UpdateCardResponse{}, nil
+}
+
+// DeleteCard handles HTTP/2 gRPC request similar to DELETE in HTTP/1.1.
+func (cc *CardCommand) DeleteCard(ctx context.Context, request *api.DeleteCardRequest) (*api.DeleteCardResponse, error) {
+	return &api.DeleteCardResponse{}, nil
+}
+
+func createCardFromCreateCardRequest(request *api.CreateCardRequest, userID, walletID int64) *entity.UserCard {
+	return &entity.UserCard{
+		UserID:       userID,
+		WalletID:     walletID,
+		LimitDaily:   request.GetCard().GetLimitDaily(),
+		LimitMonthly: request.GetCard().GetLimitMontly(),
+	}
+}
