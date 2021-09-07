@@ -252,7 +252,7 @@
           "example": 1000000.00,
           "description": "A hard limit of daily card usage"
         },
-        "limitMontly": {
+        "limitMonthly": {
           "type": "number",
           "format": "double",
           "example": 5000000.00,

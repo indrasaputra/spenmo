@@ -111,11 +111,11 @@ func createCardAPI() *api.Card {
 	walletID := hashids.ID(card.WalletID).EncodeString()
 
 	return &api.Card{
-		Id:          id,
-		UserId:      userID,
-		WalletId:    walletID,
-		LimitDaily:  card.LimitDaily,
-		LimitMontly: card.LimitMonthly,
+		Id:           id,
+		UserId:       userID,
+		WalletId:     walletID,
+		LimitDaily:   card.LimitDaily,
+		LimitMonthly: card.LimitMonthly,
 	}
 }
 

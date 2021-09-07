@@ -57,6 +57,6 @@ func createCardFromCreateCardRequest(request *api.CreateCardRequest, userID, wal
 		UserID:       userID,
 		WalletID:     walletID,
 		LimitDaily:   request.GetCard().GetLimitDaily(),
-		LimitMonthly: request.GetCard().GetLimitMontly(),
+		LimitMonthly: request.GetCard().GetLimitMonthly(),
 	}
 }
