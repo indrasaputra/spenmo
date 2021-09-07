@@ -1,4 +1,25 @@
 GO_UNIT_TEST_FILES	= $(shell go list ./... | grep -v /feature)
+PROTOGEN_IMAGE 		= indrasaputra/protogen:2021-09-07
+
+.PHONY: tidy
+tidy:
+	GO111MODULE=on go mod tidy
+
+.PHONY: format
+format:
+	bin/format.sh
+
+.PHONY: lint.cleancache
+lint.cleancache:
+	golangci-lint cache clean
+
+.PHONY: lint
+lint: lint.cleancache
+	buf lint
+	golangci-lint run ./...
+
+.PHONY: pretty
+pretty: tidy format lint
 
 .PHONY: test.cleancache
 test.cleancache:
@@ -7,6 +28,18 @@ test.cleancache:
 .PHONY: test.unit
 test.unit: test.cleancache
 	go test -v -race $(GO_UNIT_TEST_FILES)
+
+.PHONY: gen.proto
+gen.proto:
+	bin/generate-proto.sh
+
+.PHONY: gen.proto.docker
+gen.proto.docker:
+	docker run -it --rm \
+    --mount "type=bind,source=$(PWD),destination=/work" \
+    --mount "type=volume,source=spenmo-go-mod-cache,destination=/go,consistency=cached" \
+    --mount "type=volume,source=spenmo-buf-cache,destination=/home/.cache,consistency=cached" \
+    -w /work $(PROTOGEN_IMAGE) make -e -f Makefile gen.proto pretty
 
 .PHONY: migration
 migration:
@@ -27,3 +60,4 @@ rollback.all:
 .PHONY: migrate.force
 migrate.force:
 	migrate -path db/migrations -database "$(url)?sslmode=disable" -verbose force $(version)
+

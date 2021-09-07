@@ -11,13 +11,13 @@ func TestSequenceExists(t *testing.T) {
 	t.Run("sequence exists", func(t *testing.T) {
 		numbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 		seqs := [][]int{
-			[]int{2},
-			[]int{1, 2},
-			[]int{2, 3, 4},
-			[]int{3, 4, 5, 6, 7},
-			[]int{4, 5, 6, 7, 8, 9, 10},
-			[]int{7, 8, 9},
-			[]int{9, 10},
+			{2},
+			{1, 2},
+			{2, 3, 4},
+			{3, 4, 5, 6, 7},
+			{4, 5, 6, 7, 8, 9, 10},
+			{7, 8, 9},
+			{9, 10},
 		}
 
 		for _, seq := range seqs {
@@ -31,13 +31,13 @@ func TestSequenceExists(t *testing.T) {
 	t.Run("sequence doesn't exists", func(t *testing.T) {
 		numbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 		seqs := [][]int{
-			[]int{1, 2, 4},
-			[]int{2, 3, 4, 6},
-			[]int{3, 4, 5, 6, 7, 9},
-			[]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
-			[]int{7, 8, 9, 10, 11},
-			[]int{9, 11},
-			[]int{},
+			{1, 2, 4},
+			{2, 3, 4, 6},
+			{3, 4, 5, 6, 7, 9},
+			{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+			{7, 8, 9, 10, 11},
+			{9, 11},
+			{},
 		}
 
 		for _, seq := range seqs {

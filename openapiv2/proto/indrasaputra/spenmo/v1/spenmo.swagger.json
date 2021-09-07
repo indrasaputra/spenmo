@@ -1,0 +1,310 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Spenmo User's Card API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Indra Saputra",
+      "url": "https://github.com/indrasaputra"
+    },
+    "license": {
+      "name": "BSD 3-Clause License",
+      "url": "https://github.com/indrasaputra/spenmo/blob/main/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "CardCommandService",
+      "description": "This service provides basic command or state-changing use cases to work with user's card."
+    },
+    {
+      "name": "CardQueryService",
+      "description": "This service provides basic query or data-retrieving use cases to work with user's card."
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/users/cards": {
+      "get": {
+        "summary": "Get all user's cards.",
+        "description": "This endpoint gets all available user's cards in the system.",
+        "operationId": "CardQueryService_GetAllCards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetAllCardsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "CardQueryService"
+        ]
+      },
+      "post": {
+        "summary": "Create a new card.",
+        "description": "This endpoint creates a new card with provided walletId, limitDaily, and\nlimitMonthly. The user information is taken from authentication.",
+        "operationId": "CardCommandService_CreateCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Card"
+            }
+          }
+        ],
+        "tags": [
+          "CardCommandService"
+        ]
+      }
+    },
+    "/v1/users/cards/{id}": {
+      "get": {
+        "summary": "Get a card information.",
+        "description": "This endpoint gets a single card by its key.\nThe user information is taken from authentication.",
+        "operationId": "CardQueryService_GetCardByKey",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetCardByKeyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier of a card",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CardQueryService"
+        ]
+      },
+      "delete": {
+        "summary": "Delete an existing card.",
+        "description": "This endpoint deletes a card by its id.\nThe operation is soft-delete, thus the card will stay in storage.\nThe user information is taken from authentication.",
+        "operationId": "CardCommandService_DeleteCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier of a card",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CardCommandService"
+        ]
+      },
+      "put": {
+        "summary": "Update an existing card.",
+        "description": "This endpoint update card's information.\nThe user information is taken from authentication.",
+        "operationId": "CardCommandService_UpdateCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Unique identifier of a card",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Card"
+            }
+          }
+        ],
+        "tags": [
+          "CardCommandService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "string",
+          "example": "kmzwa8awaa",
+          "description": "Unique identifier of a card",
+          "readOnly": true
+        },
+        "userId": {
+          "type": "string",
+          "format": "string",
+          "example": "abcdefgh",
+          "description": "User who owns the card",
+          "readOnly": true
+        },
+        "walletId": {
+          "type": "string",
+          "format": "string",
+          "example": "qwerty",
+          "description": "Wallet where the card belongs to",
+          "required": [
+            "walletId"
+          ]
+        },
+        "limitDaily": {
+          "type": "number",
+          "format": "double",
+          "example": 1000000.00,
+          "description": "A hard limit of daily card usage"
+        },
+        "limitMontly": {
+          "type": "number",
+          "format": "double",
+          "example": 5000000.00,
+          "description": "A hard limit of monthly card usage"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "walletId"
+      ]
+    },
+    "v1CreateCardResponse": {
+      "type": "object"
+    },
+    "v1DeleteCardResponse": {
+      "type": "object"
+    },
+    "v1GetAllCardsResponse": {
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Card"
+          }
+        }
+      }
+    },
+    "v1GetCardByKeyResponse": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "$ref": "#/definitions/v1Card"
+        }
+      }
+    },
+    "v1UpdateCardResponse": {
+      "type": "object"
+    }
+  }
+}

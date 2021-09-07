@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package proto.indrasaputra.spenmo.v1;
+
+option go_package = "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1;spenmov1";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info : {
+    title : "Spenmo User's Card API",
+    version : "1.0.0",
+    contact : {
+      name : "Indra Saputra",
+      url : "https://github.com/indrasaputra",
+    },
+    license : {
+      name : "BSD 3-Clause License",
+      url : "https://github.com/indrasaputra/spenmo/blob/main/LICENSE",
+    },
+  },
+  consumes : "application/json",
+  produces : "application/json",
+};
+
+service CardCommandService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {
+    description : "This service provides basic command or state-changing use "
+                  "cases to work with "
+                  "user's card."
+  };
+
+  // Create a new card.
+  //
+  // This endpoint creates a new card with provided walletId, limitDaily, and
+  // limitMonthly. The user information is taken from authentication.
+  rpc CreateCard(CreateCardRequest) returns (CreateCardResponse) {
+    option (google.api.http) = {
+      post : "/v1/users/cards",
+      body : "card"
+    };
+  }
+
+  // Update an existing card.
+  //
+  // This endpoint update card's information.
+  // The user information is taken from authentication.
+  rpc UpdateCard(UpdateCardRequest) returns (UpdateCardResponse) {
+    option (google.api.http) = {
+      put : "/v1/users/cards/{id}",
+      body : "card"
+    };
+  }
+
+  // Delete an existing card.
+  //
+  // This endpoint deletes a card by its id.
+  // The operation is soft-delete, thus the card will stay in storage.
+  // The user information is taken from authentication.
+  rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse) {
+    option (google.api.http) = {
+      delete : "/v1/users/cards/{id}",
+    };
+  }
+}
+
+service CardQueryService {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_tag) = {
+    description : "This service provides basic query or data-retrieving use "
+                  "cases to work with "
+                  "user's card."
+  };
+
+  // Get a card information.
+  //
+  // This endpoint gets a single card by its key.
+  // The user information is taken from authentication.
+  rpc GetCardByKey(GetCardByKeyRequest) returns (GetCardByKeyResponse) {
+    option (google.api.http) = {
+      get : "/v1/users/cards/{id}",
+    };
+  }
+
+  // Get all user's cards.
+  //
+  // This endpoint gets all available user's cards in the system.
+  rpc GetAllCards(GetAllCardsRequest) returns (GetAllCardsResponse) {
+    option (google.api.http) = {
+      get : "/v1/users/cards",
+    };
+  }
+}
+
+message CreateCardRequest { Card card = 1; }
+
+message CreateCardResponse {}
+
+message UpdateCardRequest {
+  string id = 1
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        required : "id",
+        description : "Unique identifier of a card",
+        example : "\"kmzwa8awaa\"",
+      } ];
+
+  Card card = 2;
+}
+
+message UpdateCardResponse {}
+
+message DeleteCardRequest {
+  string id = 1
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        required : "id",
+        description : "Unique identifier of a card",
+        example : "\"kmzwa8awaa\"",
+      } ];
+}
+
+message DeleteCardResponse {}
+
+message GetCardByKeyRequest {
+  string id = 1
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        required : "id",
+        description : "Unique identifier of a card",
+        example : "\"kmzwa8awaa\"",
+      } ];
+}
+
+message GetCardByKeyResponse { Card card = 2; }
+
+message GetAllCardsRequest {}
+
+message GetAllCardsResponse { repeated Card cards = 1; }
+
+message Card {
+  string id = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description : "Unique identifier of a card",
+      format : "string",
+      example : "\"kmzwa8awaa\"",
+    }
+  ];
+
+  string user_id = 2 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description : "User who owns the card",
+      format : "string",
+      example : "\"abcdefgh\"",
+    }
+  ];
+
+  string wallet_id = 3
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        required : "walletId",
+        description : "Wallet where the card belongs to",
+        format : "string",
+        example : "\"qwerty\"",
+      } ];
+
+  double limit_daily = 4
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description : "A hard limit of daily card usage",
+        example : "1000000.00",
+      } ];
+
+  double limit_montly = 5
+      [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description : "A hard limit of monthly card usage",
+        example : "5000000.00",
+      } ];
+
+  google.protobuf.Timestamp created_at = 6
+      [ (google.api.field_behavior) = OUTPUT_ONLY ];
+  google.protobuf.Timestamp updated_at = 7
+      [ (google.api.field_behavior) = OUTPUT_ONLY ];
+  google.protobuf.Timestamp deleted_at = 8
+      [ (google.api.field_behavior) = OUTPUT_ONLY ];
+}
+
+message CardError { CardErrorCode error_code = 1; }
+
+enum CardErrorCode {
+  // Default enum code according to
+  // https://medium.com/@akhaku/protobuf-definition-best-practices-87f281576f31.
+  UNSPECIFIED = 0;
+
+  // Unexpected behavior occured in system.
+  INTERNAL = 1;
+
+  // Card instance is empty or nil.
+  EMPTY_CARD = 2;
+
+  // Card's id is invalid.
+  INVALID_KEY = 3;
+
+  // Card not found in system.
+  NOT_FOUND = 4;
+}
