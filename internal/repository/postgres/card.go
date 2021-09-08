@@ -2,7 +2,10 @@ package postgres
 
 import (
 	"context"
+	"log"
 	"time"
+
+	"github.com/jackc/pgx/v4"
 
 	"github.com/indrasaputra/spenmo/entity"
 )
@@ -43,4 +46,46 @@ func (c *Card) Insert(ctx context.Context, card *entity.UserCard) error {
 		return entity.ErrInternal(err.Error())
 	}
 	return nil
+}
+
+// GetByID gets a single user's card from the repository.
+// If the user's card can't be found, it returns NotFound error.
+func (c *Card) GetByID(ctx context.Context, userID, cardID int64) (*entity.UserCard, error) {
+	query := "SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL LIMIT 1"
+	row := c.pool.QueryRow(ctx, query, cardID, userID)
+
+	res := entity.UserCard{}
+	err := row.Scan(&res.ID, &res.UserID, &res.WalletID, &res.LimitDaily, &res.LimitMonthly, &res.CreatedAt, &res.UpdatedAt)
+	if err == pgx.ErrNoRows {
+		return nil, entity.ErrNotFound()
+	}
+	if err != nil {
+		return nil, entity.ErrInternal(err.Error())
+	}
+	return &res, nil
+}
+
+// GetAll gets all user's cards available in repository.
+// If there isn't any user's card in repository, it returns empty list of user's card and nil error.
+func (c *Card) GetAll(ctx context.Context, userID int64) ([]*entity.UserCard, error) {
+	query := "SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE user_id = $1 AND deleted_at IS NULL"
+	rows, err := c.pool.Query(ctx, query, userID)
+	if err != nil {
+		return []*entity.UserCard{}, entity.ErrInternal(err.Error())
+	}
+	defer rows.Close()
+
+	res := []*entity.UserCard{}
+	for rows.Next() {
+		var tmp entity.UserCard
+		if err := rows.Scan(&tmp.ID, &tmp.UserID, &tmp.WalletID, &tmp.LimitDaily, &tmp.LimitMonthly, &tmp.CreatedAt, &tmp.UpdatedAt); err != nil {
+			log.Printf("[Card-GetAll] scan rows error: %s", err.Error())
+			continue
+		}
+		res = append(res, &tmp)
+	}
+	if rows.Err() != nil {
+		return []*entity.UserCard{}, entity.ErrInternal(rows.Err().Error())
+	}
+	return res, nil
 }

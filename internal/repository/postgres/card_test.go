@@ -5,7 +5,9 @@ import (
 	"errors"
 	"log"
 	"testing"
+	"time"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 
@@ -15,6 +17,11 @@ import (
 
 var (
 	testCtx                = context.Background()
+	testUserID             = int64(1)
+	testCardID             = int64(1)
+	testWalletID           = int64(1)
+	testLimitDaily         = float64(1000000)
+	testLimitMonthly       = float64(5000000)
 	errPostgresInternalMsg = "database down"
 	errPostgresInternal    = errors.New(errPostgresInternalMsg)
 )
@@ -62,6 +69,114 @@ func TestCard_Insert(t *testing.T) {
 		err := exec.card.Insert(testCtx, createCard())
 
 		assert.Nil(t, err)
+	})
+}
+
+func TestCard_GetByID(t *testing.T) {
+	t.Run("record not found", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE id = \$1 AND user_id = \$2 AND deleted_at IS NULL LIMIT 1`).
+			WillReturnError(pgx.ErrNoRows)
+
+		res, err := exec.card.GetByID(testCtx, testUserID, testCardID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrNotFound(), err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("query returns error", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE id = \$1 AND user_id = \$2 AND deleted_at IS NULL LIMIT 1`).
+			WillReturnError(errPostgresInternal)
+
+		res, err := exec.card.GetByID(testCtx, testUserID, testCardID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(errPostgresInternalMsg), err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("successfully retrieve a record", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE id = \$1 AND user_id = \$2 AND deleted_at IS NULL LIMIT 1`).
+			WillReturnRows(pgxmock.
+				NewRows([]string{"id", "user_id", "wallet_id", "limit_daily", "limit_monthly", "created_at", "updated_at"}).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()),
+			)
+
+		res, err := exec.card.GetByID(testCtx, testUserID, testCardID)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+	})
+}
+
+func TestCard_GetAll(t *testing.T) {
+	t.Run("query returns error", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE user_id = \$1 AND deleted_at IS NULL`).
+			WillReturnError(errPostgresInternal)
+
+		res, err := exec.card.GetAll(testCtx, testUserID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(errPostgresInternalMsg), err)
+		assert.Empty(t, res)
+	})
+
+	t.Run("scan returns error", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE user_id = \$1 AND deleted_at IS NULL`).
+			WillReturnRows(pgxmock.
+				NewRows([]string{"id", "user_id", "wallet_id", "limit_daily", "limit_monthly", "created_at", "updated_at"}).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()).
+				AddRow("#$1", testUserID, testWalletID, testLimitDaily, testLimitMonthly, "time.Now()", "time.Now()"),
+			)
+
+		res, err := exec.card.GetAll(testCtx, testUserID)
+
+		assert.Nil(t, err)
+		assert.Equal(t, 1, len(res))
+	})
+
+	t.Run("rows error after all scans", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE user_id = \$1 AND deleted_at IS NULL`).
+			WillReturnRows(pgxmock.
+				NewRows([]string{"id", "user_id", "wallet_id", "limit_daily", "limit_monthly", "created_at", "updated_at"}).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()).
+				RowError(2, errPostgresInternal),
+			)
+
+		res, err := exec.card.GetAll(testCtx, testUserID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(errPostgresInternalMsg), err)
+		assert.Empty(t, res)
+	})
+
+	t.Run("success get all records", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectQuery(`SELECT id, user_id, wallet_id, limit_daily, limit_monthly, created_at, updated_at FROM user_cards WHERE user_id = \$1 AND deleted_at IS NULL`).
+			WillReturnRows(pgxmock.
+				NewRows([]string{"id", "user_id", "wallet_id", "limit_daily", "limit_monthly", "created_at", "updated_at"}).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()).
+				AddRow(testCardID, testUserID, testWalletID, testLimitDaily, testLimitMonthly, time.Now(), time.Now()),
+			)
+
+		res, err := exec.card.GetAll(testCtx, testUserID)
+
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(res))
 	})
 }
 

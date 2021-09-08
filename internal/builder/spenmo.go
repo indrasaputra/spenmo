@@ -19,6 +19,13 @@ func BuildCardCommandHandler(pool *pgxpool.Pool) *handler.CardCommand {
 	return handler.NewCardCommand(creator)
 }
 
+// BuildCardQueryHandler builds card command handler including all of its dependencies.
+func BuildCardQueryHandler(pool *pgxpool.Pool) *handler.CardQuery {
+	psql := postgres.NewCard(pool)
+	getter := service.NewCardGetter(psql)
+	return handler.NewCardQuery(getter)
+}
+
 // BuildPgxPool builds a pool of pgx client.
 func BuildPgxPool(cfg *config.Postgres) (*pgxpool.Pool, error) {
 	connCfg := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable pool_max_conns=%s pool_max_conn_lifetime=%s pool_max_conn_idle_time=%s",

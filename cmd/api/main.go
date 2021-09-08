@@ -47,12 +47,16 @@ func registerGrpcHandlers(server *grpc.Server, cfg *config.Config, psql *pgxpool
 	// start register all module's gRPC handlers
 	command := builder.BuildCardCommandHandler(psql)
 	api.RegisterCardCommandServiceServer(server, command)
+	query := builder.BuildCardQueryHandler(psql)
+	api.RegisterCardQueryServiceServer(server, query)
 	// end of register all module's gRPC handlers
 }
 
 func registerRestHandlers(ctx context.Context, server *runtime.ServeMux, grpcPort string, options ...grpc.DialOption) {
 	// start register all module's REST handlers
 	err := api.RegisterCardCommandServiceHandlerFromEndpoint(ctx, server, grpcPort, options)
+	checkError(err)
+	err = api.RegisterCardQueryServiceHandlerFromEndpoint(ctx, server, grpcPort, options)
 	checkError(err)
 	// end of register all module's REST handlers
 }

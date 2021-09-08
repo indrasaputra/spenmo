@@ -18,6 +18,14 @@ func TestBuildCardCommandHandler(t *testing.T) {
 	})
 }
 
+func TestBuildCardQueryHandler(t *testing.T) {
+	t.Run("success create card query handler", func(t *testing.T) {
+		psql := &pgxpool.Pool{}
+		handler := builder.BuildCardQueryHandler(psql)
+		assert.NotNil(t, handler)
+	})
+}
+
 func TestBuildPgxPool(t *testing.T) {
 	cfg := &config.Postgres{
 		Host:            "localhost",
