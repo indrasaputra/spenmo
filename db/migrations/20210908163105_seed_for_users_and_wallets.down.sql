@@ -1,0 +1,6 @@
+BEGIN;
+
+DELETE FROM user_wallets;
+DELETE FROM users;
+
+COMMIT;
