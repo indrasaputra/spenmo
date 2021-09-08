@@ -106,6 +106,7 @@ func defaultUnaryServerInterceptors() []grpc.UnaryServerInterceptor {
 		grpc_prometheus.UnaryServerInterceptor,
 		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 		interceptor.OpenTracingUnaryServerInterceptor(),
+		interceptor.AuthUnaryServerInterceptor(),
 	}
 	return options
 }

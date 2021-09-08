@@ -10,12 +10,13 @@ import (
 
 	"github.com/indrasaputra/spenmo/entity"
 	"github.com/indrasaputra/spenmo/internal/grpc/handler"
+	"github.com/indrasaputra/spenmo/internal/grpc/interceptor"
 	api "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1"
 	mock_service "github.com/indrasaputra/spenmo/test/mock/service"
 )
 
 var (
-	testCtx = context.Background()
+	testCtx = context.WithValue(context.Background(), interceptor.ContextKeyUser, int64(1))
 )
 
 type CardCommandExecutor struct {

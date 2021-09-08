@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/indrasaputra/spenmo/entity"
+	"github.com/indrasaputra/spenmo/internal/grpc/interceptor"
 	api "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1"
 	"github.com/indrasaputra/spenmo/service"
 )
@@ -30,8 +31,7 @@ func (cq *CardQuery) GetCardByID(ctx context.Context, request *api.GetCardByIDRe
 		return nil, entity.ErrEmptyCard()
 	}
 
-	// TODO: get from header
-	userID := int64(1)
+	userID := ctx.Value(interceptor.ContextKeyUser).(int64)
 	cardID, err := hashids.DecodeHash([]byte(request.GetId()))
 	if err != nil {
 		return nil, entity.ErrInvalidID()
@@ -49,8 +49,7 @@ func (cq *CardQuery) GetAllCards(ctx context.Context, request *api.GetAllCardsRe
 		return nil, entity.ErrEmptyCard()
 	}
 
-	// TODO: get from header
-	userID := int64(1)
+	userID := ctx.Value(interceptor.ContextKeyUser).(int64)
 	cards, err := cq.getter.GetAll(ctx, userID)
 	if err != nil {
 		return nil, err

@@ -6,6 +6,7 @@ import (
 	"github.com/indrasaputra/hashids"
 
 	"github.com/indrasaputra/spenmo/entity"
+	"github.com/indrasaputra/spenmo/internal/grpc/interceptor"
 	api "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1"
 	"github.com/indrasaputra/spenmo/service"
 )
@@ -28,8 +29,7 @@ func (cc *CardCommand) CreateCard(ctx context.Context, request *api.CreateCardRe
 		return nil, entity.ErrEmptyCard()
 	}
 
-	// TODO: get from header
-	userID := int64(1)
+	userID := ctx.Value(interceptor.ContextKeyUser).(int64)
 	walletID, err := hashids.DecodeHash([]byte(request.GetCard().GetWalletId()))
 	if err != nil {
 		return nil, entity.ErrInvalidWallet()

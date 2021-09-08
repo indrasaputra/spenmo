@@ -7,6 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/indrasaputra/spenmo/internal/grpc/interceptor"
@@ -19,12 +22,48 @@ const (
 )
 
 var (
-	testCtx = context.Background()
+	testCtxNoAuth    = context.Background()
+	testCtxWrongAuth = context.WithValue(context.Background(), interceptor.ContextKeyUser, "abc")
+	testCtx          = metadata.AppendToOutgoingContext(testCtxNoAuth, "authorization", "1")
 )
 
 type CardClientExecutor struct {
 	client api.CardCommandServiceClient
 	closer func()
+}
+
+func TestAuthUnaryServerInterceptor(t *testing.T) {
+	t.Run("authorization doesn't exist", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.AuthUnaryServerInterceptor())
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtxNoAuth, &api.CreateCardRequest{})
+
+		assert.NotNil(t, err)
+		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+		assert.Nil(t, resp)
+	})
+
+	t.Run("authorization is not integer", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.AuthUnaryServerInterceptor())
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtxWrongAuth, &api.CreateCardRequest{})
+
+		assert.NotNil(t, err)
+		assert.Equal(t, codes.Unauthenticated, status.Code(err))
+		assert.Nil(t, resp)
+	})
+
+	t.Run("success authenticate", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.AuthUnaryServerInterceptor())
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtx, &api.CreateCardRequest{})
+
+		assert.Nil(t, err)
+		assert.NotNil(t, resp)
+	})
 }
 
 func TestOpenTracingUnaryServerInterceptor(t *testing.T) {
