@@ -30,24 +30,22 @@ func NewCardCreator(repo CreateCardRepository) *CardCreator {
 
 // Create creates a new user's card and store it in the storage.
 func (cc *CardCreator) Create(ctx context.Context, card *entity.UserCard) error {
-	if err := validateCard(card); err != nil {
+	if err := validateCardForCreate(card); err != nil {
 		return err
 	}
 	return cc.repo.Insert(ctx, card)
 }
 
-func validateCard(card *entity.UserCard) error {
-	if card == nil {
-		return entity.ErrEmptyCard()
+func validateCardForCreate(card *entity.UserCard) error {
+	if err := validateCardForUpdate(card); err != nil {
+		return err
 	}
-	if card.UserID == 0 {
-		return entity.ErrInvalidUser()
-	}
-	if card.WalletID == 0 {
+	return validateWalletID(card.WalletID)
+}
+
+func validateWalletID(walletID int64) error {
+	if walletID == 0 {
 		return entity.ErrInvalidWallet()
-	}
-	if card.LimitDaily <= 0 || card.LimitMonthly <= 0 {
-		return entity.ErrInvalidLimit()
 	}
 	return nil
 }

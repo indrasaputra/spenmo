@@ -89,3 +89,19 @@ func (c *Card) GetAll(ctx context.Context, userID int64) ([]*entity.UserCard, er
 	}
 	return res, nil
 }
+
+// Update updates the given card information in repository.
+func (c *Card) Update(ctx context.Context, card *entity.UserCard) error {
+	query := "UPDATE user_cards " +
+		"SET limit_daily = $1, limit_monthly = $2, updated_at = $3 " +
+		"WHERE id = $4 AND user_id = $5 AND deleted_at IS NULL"
+
+	tag, err := c.pool.Exec(ctx, query, card.LimitDaily, card.LimitMonthly, time.Now().UTC(), card.ID, card.UserID)
+	if err != nil {
+		return entity.ErrInternal(err.Error())
+	}
+	if tag.RowsAffected() == 0 {
+		return entity.ErrNotFound()
+	}
+	return nil
+}

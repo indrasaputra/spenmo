@@ -15,8 +15,11 @@ import (
 // BuildCardCommandHandler builds card command handler including all of its dependencies.
 func BuildCardCommandHandler(pool *pgxpool.Pool) *handler.CardCommand {
 	psql := postgres.NewCard(pool)
+
 	creator := service.NewCardCreator(psql)
-	return handler.NewCardCommand(creator)
+	updater := service.NewCardUpdater(psql)
+
+	return handler.NewCardCommand(creator, updater)
 }
 
 // BuildCardQueryHandler builds card command handler including all of its dependencies.

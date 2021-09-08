@@ -180,6 +180,43 @@ func TestCard_GetAll(t *testing.T) {
 	})
 }
 
+func TestCard_Update(t *testing.T) {
+	t.Run("query returns error", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET limit_daily = \$1, limit_monthly = \$2, updated_at = \$3 WHERE id = \$4 AND user_id = \$5 AND deleted_at IS NULL`).
+			WillReturnError(errPostgresInternal)
+
+		err := exec.card.Update(testCtx, createCard())
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(errPostgresInternalMsg), err)
+	})
+
+	t.Run("no card updated", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET limit_daily = \$1, limit_monthly = \$2, updated_at = \$3 WHERE id = \$4 AND user_id = \$5 AND deleted_at IS NULL`).
+			WillReturnResult(pgxmock.NewResult("UPDATE", 0))
+
+		err := exec.card.Update(testCtx, createCard())
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrNotFound(), err)
+	})
+
+	t.Run("success update card", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET limit_daily = \$1, limit_monthly = \$2, updated_at = \$3 WHERE id = \$4 AND user_id = \$5 AND deleted_at IS NULL`).
+			WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+
+		err := exec.card.Update(testCtx, createCard())
+
+		assert.Nil(t, err)
+	})
+}
+
 func createCardExecutor() *CardExecutor {
 	mock, err := pgxmock.NewPool(pgxmock.MonitorPingsOption(true))
 	if err != nil {
