@@ -18,8 +18,9 @@ func BuildCardCommandHandler(pool *pgxpool.Pool) *handler.CardCommand {
 
 	creator := service.NewCardCreator(psql)
 	updater := service.NewCardUpdater(psql)
+	deleter := service.NewCardDeleter(psql)
 
-	return handler.NewCardCommand(creator, updater)
+	return handler.NewCardCommand(creator, updater, deleter)
 }
 
 // BuildCardQueryHandler builds card command handler including all of its dependencies.

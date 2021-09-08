@@ -105,3 +105,20 @@ func (c *Card) Update(ctx context.Context, card *entity.UserCard) error {
 	}
 	return nil
 }
+
+// Delete deletes the given card information in repository.
+// It performs soft delete.
+func (c *Card) Delete(ctx context.Context, userID, cardID int64) error {
+	query := "UPDATE user_cards " +
+		"SET deleted_at = $1 " +
+		"WHERE id = $2 AND user_id = $3 AND deleted_at IS NULL"
+
+	tag, err := c.pool.Exec(ctx, query, time.Now().UTC(), cardID, userID)
+	if err != nil {
+		return entity.ErrInternal(err.Error())
+	}
+	if tag.RowsAffected() == 0 {
+		return entity.ErrNotFound()
+	}
+	return nil
+}

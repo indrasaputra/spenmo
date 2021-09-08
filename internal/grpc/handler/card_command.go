@@ -17,13 +17,15 @@ type CardCommand struct {
 
 	creator service.CreateCard
 	updater service.UpdateCard
+	deleter service.DeleteCard
 }
 
 // NewCardCommand creates an instance of CardCommand.
-func NewCardCommand(creator service.CreateCard, updater service.UpdateCard) *CardCommand {
+func NewCardCommand(creator service.CreateCard, updater service.UpdateCard, deleter service.DeleteCard) *CardCommand {
 	return &CardCommand{
 		creator: creator,
 		updater: updater,
+		deleter: deleter,
 	}
 }
 
@@ -67,6 +69,20 @@ func (cc *CardCommand) UpdateCard(ctx context.Context, request *api.UpdateCardRe
 
 // DeleteCard handles HTTP/2 gRPC request similar to DELETE in HTTP/1.1.
 func (cc *CardCommand) DeleteCard(ctx context.Context, request *api.DeleteCardRequest) (*api.DeleteCardResponse, error) {
+	if request == nil {
+		return nil, entity.ErrEmptyCard()
+	}
+
+	userID := ctx.Value(interceptor.ContextKeyUser).(int64)
+	cardID, err := hashids.DecodeHash([]byte(request.GetId()))
+	if err != nil {
+		return nil, entity.ErrInvalidID()
+	}
+
+	err = cc.deleter.Delete(ctx, userID, int64(cardID))
+	if err != nil {
+		return nil, err
+	}
 	return &api.DeleteCardResponse{}, nil
 }
 

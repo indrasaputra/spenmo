@@ -24,6 +24,7 @@ type CardCommandExecutor struct {
 
 	creator *mock_service.MockCreateCard
 	updater *mock_service.MockUpdateCard
+	deleter *mock_service.MockDeleteCard
 }
 
 func TestNewCardCommand(t *testing.T) {
@@ -152,15 +153,54 @@ func TestCardCommand_UpdateCard(t *testing.T) {
 	})
 }
 
-func createCardCommandExecutor(ctrl *gomock.Controller) *CardCommandExecutor {
-	c := mock_service.NewMockCreateCard(ctrl)
-	u := mock_service.NewMockUpdateCard(ctrl)
-	h := handler.NewCardCommand(c, u)
-	return &CardCommandExecutor{
-		handler: h,
-		creator: c,
-		updater: u,
-	}
+func TestCardCommand_DeleteCard(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	t.Run("nil request is prohibited", func(t *testing.T) {
+		exec := createCardCommandExecutor(ctrl)
+
+		res, err := exec.handler.DeleteCard(testCtx, nil)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrEmptyCard(), err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("card id is not hashid", func(t *testing.T) {
+		exec := createCardCommandExecutor(ctrl)
+		req := createDeleteCardRequest()
+		req.Id = "abc"
+
+		res, err := exec.handler.DeleteCard(testCtx, req)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInvalidID(), err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("card creator service returns error", func(t *testing.T) {
+		exec := createCardCommandExecutor(ctrl)
+		card := createCard()
+		exec.deleter.EXPECT().Delete(testCtx, card.UserID, card.ID).Return(entity.ErrInternal(""))
+
+		res, err := exec.handler.DeleteCard(testCtx, createDeleteCardRequest())
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(""), err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("success delete user's card", func(t *testing.T) {
+		exec := createCardCommandExecutor(ctrl)
+		card := createCard()
+		exec.deleter.EXPECT().Delete(testCtx, card.UserID, card.ID).Return(nil)
+
+		res, err := exec.handler.DeleteCard(testCtx, createDeleteCardRequest())
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+	})
 }
 
 func createCard() *entity.UserCard {
@@ -191,5 +231,24 @@ func createCreateCardRequest() *api.CreateCardRequest {
 func createUpdateCardRequest() *api.UpdateCardRequest {
 	return &api.UpdateCardRequest{
 		Card: createCardAPI(),
+	}
+}
+
+func createDeleteCardRequest() *api.DeleteCardRequest {
+	return &api.DeleteCardRequest{
+		Id: createCardAPI().GetId(),
+	}
+}
+
+func createCardCommandExecutor(ctrl *gomock.Controller) *CardCommandExecutor {
+	c := mock_service.NewMockCreateCard(ctrl)
+	u := mock_service.NewMockUpdateCard(ctrl)
+	d := mock_service.NewMockDeleteCard(ctrl)
+	h := handler.NewCardCommand(c, u, d)
+	return &CardCommandExecutor{
+		handler: h,
+		creator: c,
+		updater: u,
+		deleter: d,
 	}
 }

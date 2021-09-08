@@ -217,6 +217,43 @@ func TestCard_Update(t *testing.T) {
 	})
 }
 
+func TestCard_Delete(t *testing.T) {
+	t.Run("query returns error", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET deleted_at = \$1 WHERE id = \$2 AND user_id = \$3 AND deleted_at IS NULL`).
+			WillReturnError(errPostgresInternal)
+
+		err := exec.card.Delete(testCtx, testUserID, testCardID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrInternal(errPostgresInternalMsg), err)
+	})
+
+	t.Run("no card deleted", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET deleted_at = \$1 WHERE id = \$2 AND user_id = \$3 AND deleted_at IS NULL`).
+			WillReturnResult(pgxmock.NewResult("UPDATE", 0))
+
+		err := exec.card.Delete(testCtx, testUserID, testCardID)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, entity.ErrNotFound(), err)
+	})
+
+	t.Run("success delete card", func(t *testing.T) {
+		exec := createCardExecutor()
+		exec.pgx.
+			ExpectExec(`UPDATE user_cards SET deleted_at = \$1 WHERE id = \$2 AND user_id = \$3 AND deleted_at IS NULL`).
+			WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+
+		err := exec.card.Delete(testCtx, testUserID, testCardID)
+
+		assert.Nil(t, err)
+	})
+}
+
 func createCardExecutor() *CardExecutor {
 	mock, err := pgxmock.NewPool(pgxmock.MonitorPingsOption(true))
 	if err != nil {
