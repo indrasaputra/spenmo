@@ -241,10 +241,7 @@
           "type": "string",
           "format": "string",
           "example": "qwerty",
-          "description": "Wallet where the card belongs to",
-          "required": [
-            "walletId"
-          ]
+          "description": "Wallet where the card belongs to. It is only required in creation process."
         },
         "limitDaily": {
           "type": "number",
@@ -273,10 +270,7 @@
           "format": "date-time",
           "readOnly": true
         }
-      },
-      "required": [
-        "walletId"
-      ]
+      }
     },
     "v1CreateCardResponse": {
       "type": "object"
