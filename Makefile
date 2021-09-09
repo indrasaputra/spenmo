@@ -21,6 +21,10 @@ lint: lint.cleancache
 .PHONY: pretty
 pretty: tidy format lint
 
+.PHONY: check.import
+check.import:
+	bin/check-import.sh
+
 .PHONY: test.cleancache
 test.cleancache:
 	go clean -testcache
@@ -80,3 +84,6 @@ rollback.all:
 migrate.force:
 	migrate -path db/migrations -database "$(url)?sslmode=disable" -verbose force $(version)
 
+.PHONY: validate.migration
+validate.migration:
+	bin/validate-migration.sh
