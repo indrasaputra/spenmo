@@ -64,6 +64,10 @@ gen.proto.docker:
     --mount "type=volume,source=spenmo-buf-cache,destination=/home/.cache,consistency=cached" \
     -w /work $(PROTOGEN_IMAGE) make -e -f Makefile gen.proto pretty
 
+.PHONY: compile
+compile:
+	GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o spenmo cmd/api/main.go
+
 .PHONY: migration
 migration:
 	migrate create -ext sql -dir db/migrations $(name)
