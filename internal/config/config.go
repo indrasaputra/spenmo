@@ -12,6 +12,7 @@ type Config struct {
 	Port        Port
 	Postgres    Postgres
 	Jaeger      Jaeger
+	RateLimit   RateLimit
 }
 
 // Port holds configuration for project's port.
@@ -41,6 +42,12 @@ type Jaeger struct {
 	SamplingParam float64 `env:"JAEGER_SAMPLING_PARAM,default=1"`
 	LogSpans      bool    `env:"JAEGER_LOG_SPANS,default=true"`
 	FlushInterval uint    `env:"JAEGER_FLUSH_INTERVAL,default=1"`
+}
+
+// RateLimit holds configuration for RateLimit.
+type RateLimit struct {
+	RatePerSecond  int `env:"RATE_LIMIT_PER_SECOND,default=1"`
+	BurstPerSecond int `env:"RATE_BURST_PER_SECOND,default=1"`
 }
 
 // NewConfig creates an instance of Config.

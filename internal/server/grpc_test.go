@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/indrasaputra/spenmo/internal/config"
 	"github.com/indrasaputra/spenmo/internal/server"
 )
 
@@ -15,7 +16,8 @@ var (
 
 func TestNewGrpc(t *testing.T) {
 	t.Run("successfully create a development gRPC server", func(t *testing.T) {
-		srv := server.NewGrpc(testPort)
+		rate := &config.RateLimit{}
+		srv := server.NewGrpc(testPort, rate)
 		defer srv.Stop()
 		assert.NotNil(t, srv)
 	})
@@ -23,7 +25,8 @@ func TestNewGrpc(t *testing.T) {
 
 func TestGrpc_Run(t *testing.T) {
 	t.Run("listener fails", func(t *testing.T) {
-		srv := server.NewGrpc("abc")
+		rate := &config.RateLimit{}
+		srv := server.NewGrpc("abc", rate)
 
 		err := srv.Run()
 		defer srv.Stop()
@@ -32,7 +35,8 @@ func TestGrpc_Run(t *testing.T) {
 	})
 
 	t.Run("success run", func(t *testing.T) {
-		srv := server.NewGrpc("8018")
+		rate := &config.RateLimit{}
+		srv := server.NewGrpc("8018", rate)
 
 		err := srv.Run()
 		defer srv.Stop()

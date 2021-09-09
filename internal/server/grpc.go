@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/indrasaputra/spenmo/internal/config"
 	"github.com/indrasaputra/spenmo/internal/grpc/interceptor"
 )
 
@@ -53,8 +54,8 @@ func newGrpc(port string, options ...grpc.ServerOption) *Grpc {
 // 	- Metrics, using Prometheus.
 // 	- Logging, using zap logger.
 // 	- Recoverer, using grpc_recovery.
-func NewGrpc(port string) *Grpc {
-	options := grpc_middleware.WithUnaryServerChain(defaultUnaryServerInterceptors()...)
+func NewGrpc(port string, rate *config.RateLimit) *Grpc {
+	options := grpc_middleware.WithUnaryServerChain(defaultUnaryServerInterceptors(rate)...)
 	srv := newGrpc(port, options)
 	grpc_prometheus.Register(srv.Server)
 	return srv
@@ -95,7 +96,7 @@ func (g *Grpc) serve() {
 	}
 }
 
-func defaultUnaryServerInterceptors() []grpc.UnaryServerInterceptor {
+func defaultUnaryServerInterceptors(rate *config.RateLimit) []grpc.UnaryServerInterceptor {
 	logger, _ := zap.NewProduction() // error is impossible, hence ignored.
 	grpc_zap.SetGrpcLoggerV2(grpc_logsettable.ReplaceGrpcLoggerV2(), logger)
 	grpc_prometheus.EnableHandlingTimeHistogram()
@@ -107,6 +108,7 @@ func defaultUnaryServerInterceptors() []grpc.UnaryServerInterceptor {
 		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
 		interceptor.OpenTracingUnaryServerInterceptor(),
 		interceptor.AuthUnaryServerInterceptor(),
+		interceptor.RateLimitUnaryServerInterceptor(rate.RatePerSecond, rate.BurstPerSecond),
 	}
 	return options
 }

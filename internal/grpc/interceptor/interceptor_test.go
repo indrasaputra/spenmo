@@ -32,6 +32,40 @@ type CardClientExecutor struct {
 	closer func()
 }
 
+func TestRateLimitUnaryServerInterceptor(t *testing.T) {
+	t.Run("request can't go through due to unrecognized user", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.RateLimitUnaryServerInterceptor(10, 10))
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtxNoAuth, &api.CreateCardRequest{})
+
+		assert.NotNil(t, err)
+		assert.Equal(t, codes.ResourceExhausted, status.Code(err))
+		assert.Nil(t, resp)
+	})
+
+	t.Run("request can't go through due to quota exhausted", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.RateLimitUnaryServerInterceptor(0, 0))
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtx, &api.CreateCardRequest{})
+
+		assert.NotNil(t, err)
+		assert.Equal(t, codes.ResourceExhausted, status.Code(err))
+		assert.Nil(t, resp)
+	})
+
+	t.Run("request can go through", func(t *testing.T) {
+		exec := createClientExecutor(interceptor.RateLimitUnaryServerInterceptor(2, 2))
+		defer exec.closer()
+
+		resp, err := exec.client.CreateCard(testCtx, &api.CreateCardRequest{})
+
+		assert.Nil(t, err)
+		assert.NotNil(t, resp)
+	})
+}
+
 func TestAuthUnaryServerInterceptor(t *testing.T) {
 	t.Run("authorization doesn't exist", func(t *testing.T) {
 		exec := createClientExecutor(interceptor.AuthUnaryServerInterceptor())

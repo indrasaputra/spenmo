@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/opentracing/opentracing-go"
+	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -28,25 +29,60 @@ const (
 	authKey   = "authorization"
 )
 
+// RateLimitUnaryServerInterceptor intercepts the request and check if the request is allowed to go through.
+func RateLimitUnaryServerInterceptor(ratePerSecond, burst int) grpc.UnaryServerInterceptor {
+	limiters := make(map[int64]*rate.Limiter)
+
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		userID, err := getUserFromContext(ctx)
+		if err != nil {
+			return nil, status.Error(codes.ResourceExhausted, "unrecognized user has no quota")
+		}
+
+		lim, ok := limiters[userID]
+		if !ok {
+			lim = rate.NewLimiter(rate.Limit(ratePerSecond), burst)
+			limiters[userID] = lim
+		}
+		if !lim.Allow() {
+			return nil, status.Error(codes.ResourceExhausted, "quota is exhausted")
+		}
+		return handler(ctx, req)
+	}
+}
+
 // AuthUnaryServerInterceptor intercepts the request and check for authentication header.
 func AuthUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		md, ok := metadata.FromIncomingContext(ctx)
-		if !ok {
-			return nil, status.Error(codes.Unauthenticated, "request is unauthenticated")
-		}
-
-		val := md[authKey]
-		if len(val) == 0 {
-			return nil, status.Error(codes.Unauthenticated, "request is unauthenticated")
-		}
-
-		id, err := strconv.ParseInt(val[0], 10, 64)
+		id, err := getUserFromContext(ctx)
 		if err != nil {
-			return nil, status.Error(codes.Unauthenticated, "request is unauthenticated")
+			return nil, err
 		}
 		return handler(context.WithValue(ctx, ContextKeyUser, id), req)
 	}
+}
+
+func getUserFromContext(ctx context.Context) (int64, error) {
+	userID, ok := ctx.Value(ContextKeyUser).(int64)
+	if ok {
+		return userID, nil
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return 0, status.Error(codes.Unauthenticated, "request is unauthenticated")
+	}
+
+	val := md[authKey]
+	if len(val) == 0 {
+		return 0, status.Error(codes.Unauthenticated, "request is unauthenticated")
+	}
+
+	id, err := strconv.ParseInt(val[0], 10, 64)
+	if err != nil {
+		return 0, status.Error(codes.Unauthenticated, "request is unauthenticated")
+	}
+	return id, nil
 }
 
 // OpenTracingUnaryServerInterceptor intercepts the request and creates a span from the incoming context.

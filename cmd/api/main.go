@@ -23,11 +23,13 @@ func main() {
 	cfg, err := config.NewConfig(".env")
 	checkError(err)
 
+	fmt.Printf("rate: %v\n", cfg.RateLimit)
+
 	psql, err := builder.BuildPgxPool(&cfg.Postgres)
 	checkError(err)
 	trc := initTracing(cfg)
 
-	grpcServer := server.NewGrpc(cfg.Port.GRPC)
+	grpcServer := server.NewGrpc(cfg.Port.GRPC, &cfg.RateLimit)
 	registerGrpcHandlers(grpcServer.Server, cfg, psql)
 
 	restServer := server.NewRest(cfg.Port.REST)
