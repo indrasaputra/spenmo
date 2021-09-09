@@ -12,6 +12,71 @@ services:
     networks:
       - spenmo
 
+  prometheus:
+    image: prom/prometheus:v2.27.1
+    ports:
+      - 9090:9090
+    volumes:
+      - ${PWD}/infrastructure/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - spenmo
+
+  grafana:
+    image: grafana/grafana:7.5.7
+    ports:
+      - 3000:3000
+    volumes:
+      - storage:/var/lib/grafana
+    networks:
+      - spenmo
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.23
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 14250:14250
+      - 9411:9411
+    networks:
+      - spenmo
+
+  api:
+    image: indrasaputra/spenmo:latest
+    environment:
+      SERVICE_NAME: spenmo-api
+      PORT_GRPC: 8080
+      PORT_REST: 8081
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgresuser
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_NAME: spenmo
+      POSTGRES_MAX_OPEN_CONNS: 50
+      POSTGRES_MAX_CONN_LIFETIME: 10m
+      POSTGRES_MAX_IDLE_LIFETIME: 5m
+      JAEGER_ENABLED: "true"
+      JAEGER_HOST: jaeger
+      JAEGER_PORT: 6831
+      JAEGER_SAMPLING_TYPE: const
+      JAEGER_SAMPLING_PARAM: 1
+      JAEGER_LOG_SPANS: "true"
+      JAEGER_FLUSH_INTERVAL: 1
+      RATE_LIMIT_PER_SECOND: 100
+      RATE_BURST_PER_SECOND: 100
+    ports:
+      - 8080:8080
+      - 8081:8081
+    networks:
+      - spenmo
+    depends_on:
+      - postgres
+
 volumes:
   storage:
 

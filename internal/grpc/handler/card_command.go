@@ -11,7 +11,7 @@ import (
 	"github.com/indrasaputra/spenmo/service"
 )
 
-// CardCommand handles HTTP/2 gRPC request for state-changing toggle .
+// CardCommand handles HTTP/2 gRPC request for state-changing user's card .
 type CardCommand struct {
 	api.UnimplementedCardCommandServiceServer
 
