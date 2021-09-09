@@ -40,6 +40,10 @@ test.coverhtml:
 	go test -v -race $(GO_UNIT_TEST_FILES) -coverprofile=coverage.out
 	go tool cover -html=coverage.out
 
+.PHONY: test.integration
+test.integration:
+	bin/godog.sh
+
 .PHONY: gen.mock
 gen.mock:
 	bin/generate-mock.sh
