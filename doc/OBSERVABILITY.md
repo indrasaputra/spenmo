@@ -19,12 +19,13 @@ The image below shows the count of each gRPC code, including the client error (i
 
 ![Spenmo error](https://user-images.githubusercontent.com/4661221/132625896-dc925a5a-7cdb-4ab7-babe-ec574ae6a5bc.png)
 
-There are also default metrics from the package, such as the number of Goroutines and Garbage Collector latency.
+#### Saturation
+
+![Spenmo virtual memory](https://user-images.githubusercontent.com/4661221/132796181-c4fccfd7-f0a5-43fb-826c-4a1565e6564c.png)
 
 ![Spenmo goroutines](https://user-images.githubusercontent.com/4661221/132627297-6695e829-5723-4e06-a8d7-d7f694062219.png)
 
 ![Spenmo GC](https://user-images.githubusercontent.com/4661221/132627315-6bde9cdd-1b89-4d54-a8b2-9661a6f7b14a.png)
-
 
 ### Tracing
 

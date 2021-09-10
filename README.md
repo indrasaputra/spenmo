@@ -11,21 +11,31 @@
 
 [Indra Saputra](https://github.com/indrasaputra)
 
+## Tasks
+
+1. The first task can be seen in [tree.go](cmd/tree/tree.go)
+
+2. The second task can be seen in [sequence.go](cmd/sequence/sequence.go)
+
+3. The third task can be seen in [schema](db/schema/SCHEMA.md)
+
+4. The fourth task is in this entire repository.
+
 ## Assumptions
 
-- Read [Assumptions](doc/ASSUMPTIONS.md)
+Read [Assumptions](doc/ASSUMPTIONS.md)
 
 ## API
 
 ### gRPC
 
-The API can be seen in proto files (`*.proto`) in directory [proto](proto/indrasaputra/spenmo/v1/spenmo.proto).
+The API documentation can be seen in proto files (`*.proto`) in directory [proto](proto/indrasaputra/spenmo/v1/spenmo.proto).
 
 ### RESTful JSON
 
 The API is automatically generated in OpenAPIv2 format when generating gRPC codes.
 The generated files are stored in directory [openapiv2](openapiv2) in JSON format (`*.json`).
-To see the RESTful API contract, do the following:
+To see the RESTful API documentation, do the following:
 - Open the generated json file(s), such as [spenmo.swagger.json](openapiv2/proto/indrasaputra/spenmo/v1/spenmo.swagger.json)
 - Copy the content
 - Open [https://editor.swagger.io/](https://editor.swagger.io/)
@@ -65,17 +75,25 @@ When application is running, then run command to execute integration test.
 $ make test.integration
 ```
 
-## Monitoring
+You can also set the server URL, in case your default server is not localhost.
+
+```
+$ SERVER_URL=http://spenmo:8081/v1/users/cards make test.integration
+```
+
+## Observability
 
 The application already emits necessary telemetry. If application's dependencies are run using [docker compose](doc/HOW_TO_RUN.md#docker), then monitoring is [provided by default](docker-compose.yaml). Otherwise, you have to provide them.
+
+The observability is implemented at the handler/controller level. So, every request will be observed. For example, there will be four golden signals (throughput, latency, error rate, and saturation), traces, and logs for each endpoint. If needed, we can implement custom monitoring on block of code we need to observe.
+
 These are stacks used as monitoring system.
 
-| Monitoring       | Stack                                      | Address                                           |
+| Observability    | Stack                                      | Address                                           |
 | ---              | ---                                        | ---                                               |
 | Metrics          | [Prometheus](https://prometheus.io/)       | [http://localhost:9090](http://localhost:9090)    |
 | Visualization    | [Grafana](https://grafana.com/)            | [http://localhost:3000](http://localhost:3000)    |
 | Tracing          | [Jaeger](https://www.jaegertracing.io/)    | [http://localhost:16686](http://localhost:16686)  |
+| Log              | [Zap](https://github.com/uber-go/zap)      | Stdout                                            |
 
-Currently, tracing only works on gRPC server (handler).
-
-Visit [OBSERVABILITY](doc/OBSERVABILITY.md) for monitoring result example.
+Visit [OBSERVABILITY](doc/OBSERVABILITY.md) for observability result example.

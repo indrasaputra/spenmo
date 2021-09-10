@@ -27,8 +27,10 @@
 
 5. Any unique identifier (ID) is exposed to user/public using [hashids](https://hashids.org/). Hashids is choosen because it only obfuscates the output while we still can use integer internally. Integer is choosen over UUID due to its simplicity, easy to remember, and easy to find, such as in a log.
 
-6. The only place that the ID doesn't use hashids is in authorization. The reason is authorization is already encoded. For example, we can use OAuth2. In OAuth2, there is a choice to use a random string as token. We can exchange the token with user ID internally.
+6. The only place that the ID doesn't use hashids is in authorization. The reason is most of authorization is already encoded. For example, we can use OAuth2. In OAuth2, there is a choice to use a random string as token. We can exchange the token with user ID internally.
 
     But, in this service, for simplicity and due to its scope, the authorization is made simple as explained in #2.
 
 7. Card deletion is soft delete.
+
+8. Not all tables in task #3 are implemented in task #4. Only relevant tables are migrated, such as `users`, `user_wallets`, and `user_cards`.

@@ -43,3 +43,8 @@ This pattern is used to add auxiliary capability to a certain use case. It can b
 ### Rate Limit
 
 This pattern is used to prevent catastrophic call to the service. It can be seen in [interceptor directory](../internal/grpc/interceptor).
+
+### CQRS
+
+This pattern is used to separate the command and query. In this project, the command and query service are already separated.
+But, due to the simple usecases and requirements, those two services are grouped in one binary application.

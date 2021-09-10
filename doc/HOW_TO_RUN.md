@@ -8,6 +8,13 @@ There are two ways to run the application. The first is to use docker image and 
 
 - We assume that the docker can be accessed via localhost. By default, it works this way. If your setting is different, please adjust accordingly.
 
+- Go to this repository directory
+
+    e.g:
+    ```
+    $ cd go/src/github.com/indrasaputra/spenmo
+    ```
+
 - Take a look at [docker-compose.yaml](../docker-compose.yaml). Change the env value as you want, but we encourage you to let it be as it is.
 
     If you change the values, please, take a second look on PostgreSQL configuration. Make sure that the values are the same as in Spenmo image.
@@ -46,51 +53,57 @@ There are two ways to run the application. The first is to use docker image and 
 
     Please, adjust the value accordingly.
 
-    Create a user's card
-    ```
-    $ curl --request POST 'http://localhost:8081/v1/users/cards' \
-        --header 'Authorization: 1' \
-        --header 'Content-Type: application/json' \
-        --data-raw '{
-            "walletId": "oWx0b8DZ1a",
-            "limitDaily": 2000000,
-            "limitMonthly": 5000000
-        }'
-    ```
+    - Create a user's card
+        ```
+        $ curl --request POST 'http://localhost:8081/v1/users/cards' \
+            --header 'Authorization: 1' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "walletId": "oWx0b8DZ1a",
+                "limitDaily": 2000000,
+                "limitMonthly": 5000000
+            }'
+        ```
 
-    Get all user's card
-    ```
-    $ curl --request GET 'http://localhost:8081/v1/users/cards' --header 'Authorization: 1'
-    ```
+    - Get all user's card
+        ```
+        $ curl --request GET 'http://localhost:8081/v1/users/cards' --header 'Authorization: 1'
+        ```
 
-    Get a single card
-    ```
-    $ curl --request GET 'http://localhost:8081/v1/users/cards/:id' --header 'Authorization: 1'
-    ```
+    - Get a single card
+        ```
+        $ curl --request GET 'http://localhost:8081/v1/users/cards/:id' --header 'Authorization: 1'
+        ```
 
-    e.g:
+        e.g:
 
-    ```
-    $ curl --request GET 'http://localhost:8081/v1/users/cards/oWx0b8DZ1a' --header 'Authorization: 1'
-    ```
+        ```
+        $ curl --request GET 'http://localhost:8081/v1/users/cards/oWx0b8DZ1a' --header 'Authorization: 1'
+        ```
 
-    Update a single card
-    ```
-    $ curl --request PUT 'http://localhost:8081/v1/users/cards/:id' \
-        --header 'Authorization: 1' \
-        --header 'Content-Type: application/json' \
-        --data-raw '{
-            "limitDaily": 2000000,
-            "limitMonthly": 3000000
-        }'
-    ```
+    - Update a single card
+        ```
+        $ curl --request PUT 'http://localhost:8081/v1/users/cards/:id' \
+            --header 'Authorization: 1' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "limitDaily": 2000000,
+                "limitMonthly": 3000000
+            }'
+        ```
 
-    Delete a single card
-    ```
-    $ curl --request DELETE 'http://localhost:8081/v1/users/cards/:id' --header 'Authorization: 1'
-    ```
+    - Delete a single card
+        ```
+        $ curl --request DELETE 'http://localhost:8081/v1/users/cards/:id' --header 'Authorization: 1'
+        ```
 
 ### Manual
+
+- Go to this repository directory
+
+    e.g:
+    ```
+    $ cd go/src/github.com/indrasaputra/spenmo
 
 - Create `.env` file
 
