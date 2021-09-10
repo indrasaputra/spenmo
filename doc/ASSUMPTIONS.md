@@ -34,3 +34,5 @@
 7. Card deletion is soft delete.
 
 8. Not all tables in task #3 are implemented in task #4. Only relevant tables are migrated, such as `users`, `user_wallets`, and `user_cards`.
+
+9. Hashids uses [default salt](https://github.com/indrasaputra/hashids/blob/main/hashids.go#L13-L15). Option to change the salt is not implemented in this scope. Check [https://goplay.space/#o8RCXF2pwfK](https://goplay.space/#o8RCXF2pwfK) to see the conversion.
