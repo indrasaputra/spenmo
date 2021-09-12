@@ -36,3 +36,7 @@
 8. Not all tables in task #3 are implemented in task #4. Only relevant tables are migrated, such as `users`, `user_wallets`, and `user_cards`.
 
 9. Hashids uses [default salt](https://github.com/indrasaputra/hashids/blob/main/hashids.go#L13-L15). Option to change the salt is not implemented in this scope. Check [https://goplay.space/#o8RCXF2pwfK](https://goplay.space/#o8RCXF2pwfK) to see the conversion.
+
+10. It is a very rare occasion that a user and a wallet have too many cards. Therefore, in `Get all user's card` API, there isn't any limit and offset. We think that a user and a wallet may only have at most 10 cards. The code doesn't check for this limitation.
+
+11. No transaction (credit or debit) is involved in this scope.
