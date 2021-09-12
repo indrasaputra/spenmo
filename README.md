@@ -13,9 +13,9 @@
 
 ## Tasks
 
-1. The first task can be seen in [tree.go](cmd/tree/tree.go)
+1. The first task can be seen in [tree.go](cmd/tree/tree.go) and [tree_test.go](cmd/tree/tree_test.go) for the test.
 
-2. The second task can be seen in [sequence.go](cmd/sequence/sequence.go)
+2. The second task can be seen in [sequence.go](cmd/sequence/sequence.go) and [sequence_test.go](cmd/sequence/sequence_test.go) for the test.
 
 3. The third task can be seen in [schema](db/schema/SCHEMA.md)
 
