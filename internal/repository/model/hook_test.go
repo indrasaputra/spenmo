@@ -10,20 +10,19 @@ import (
 )
 
 func TestHookTracing(t *testing.T) {
-	query := `INSERT INTO "user_cards" \("created_at", "updated_at", "limit_daily", "limit_monthly", "user_id", "wallet_id"\) VALUES \(\$1, \$2, \$3, \$4, \$5, \$6\) RETURNING "id"`
+	query := `DELETE FROM "user_cards" WHERE "user_cards"."id" = \$1`
 
 	t.Run("successfully insert card to database", func(t *testing.T) {
 		exec := createCardExecutor()
 		defer exec.close()
 		exec.client.Use(model.HookTracing)
 		exec.mock.ExpectBegin()
-		exec.mock.ExpectQuery(query).
-			WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
-			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+		exec.mock.ExpectExec(query).
+			WithArgs(sqlmock.AnyArg()).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 		exec.mock.ExpectCommit()
-		card := model.NewCard(exec.client)
 
-		err := card.Insert(testCtx, createCard())
+		err := exec.client.UserCard.DeleteOneID(1).Exec(testCtx)
 
 		assert.Nil(t, err)
 	})
