@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/uber/jaeger-client-go"
 	jaegerconf "github.com/uber/jaeger-client-go/config"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/indrasaputra/spenmo/internal/builder"
 	"github.com/indrasaputra/spenmo/internal/config"
+	"github.com/indrasaputra/spenmo/internal/repository/model/ent"
 	"github.com/indrasaputra/spenmo/internal/server"
 	api "github.com/indrasaputra/spenmo/proto/indrasaputra/spenmo/v1"
 )
@@ -23,21 +23,25 @@ func main() {
 	cfg, err := config.NewConfig(".env")
 	checkError(err)
 
-	fmt.Printf("rate: %v\n", cfg.RateLimit)
+	// currently using ent pgx
+	// pgx, err := builder.BuildPgxPool(&cfg.Postgres)
+	// checkError(err)
 
-	psql, err := builder.BuildPgxPool(&cfg.Postgres)
+	entpgx, err := builder.BuildEntPgxClient(&cfg.Postgres)
 	checkError(err)
+
 	trc := initTracing(cfg)
 
 	grpcServer := server.NewGrpc(cfg.Port.GRPC, &cfg.RateLimit)
-	registerGrpcHandlers(grpcServer.Server, cfg, psql)
+	registerGrpcHandlers(grpcServer.Server, cfg, entpgx)
 
 	restServer := server.NewRest(cfg.Port.REST)
 	registerRestHandlers(context.Background(), restServer.ServeMux, fmt.Sprintf(":%s", cfg.Port.GRPC), grpc.WithInsecure())
 
 	closer := func() {
 		_ = trc.Close()
-		psql.Close()
+		// pgx.Close()
+		_ = entpgx.Close()
 	}
 
 	_ = grpcServer.Run()
@@ -45,11 +49,11 @@ func main() {
 	_ = grpcServer.AwaitTermination(closer)
 }
 
-func registerGrpcHandlers(server *grpc.Server, cfg *config.Config, psql *pgxpool.Pool) {
+func registerGrpcHandlers(server *grpc.Server, cfg *config.Config, client *ent.Client) {
 	// start register all module's gRPC handlers
-	command := builder.BuildCardCommandHandler(psql)
+	command := builder.BuildCardCommandHandlerUsingEnt(client)
 	api.RegisterCardCommandServiceServer(server, command)
-	query := builder.BuildCardQueryHandler(psql)
+	query := builder.BuildCardQueryHandlerUsingEnt(client)
 	api.RegisterCardQueryServiceServer(server, query)
 	// end of register all module's gRPC handlers
 }
