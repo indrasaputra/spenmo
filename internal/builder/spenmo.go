@@ -89,5 +89,8 @@ func BuildEntPgxClient(cfg *config.Postgres) (*ent.Client, error) {
 	}
 
 	drv := entsql.OpenDB(dialect.Postgres, db)
-	return ent.NewClient(ent.Driver(drv)), nil
+	client := ent.NewClient(ent.Driver(drv))
+	client.Use(model.HookTracing)
+
+	return client, nil
 }
