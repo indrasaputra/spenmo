@@ -1,5 +1,6 @@
 GO_UNIT_TEST_FILES	= $(shell go list ./... | grep -v /feature)
 PROTOGEN_IMAGE 		= indrasaputra/protogen:2021-09-07
+ENT_SCHEMA_DIR		= ./internal/repository/model/ent/schema
 
 .PHONY: tidy
 tidy:
@@ -64,6 +65,14 @@ gen.proto.docker:
     --mount "type=volume,source=spenmo-buf-cache,destination=/home/.cache,consistency=cached" \
     -w /work $(PROTOGEN_IMAGE) make -e -f Makefile gen.proto pretty
 
+.PHONY: init.model
+init.model:
+	ent init --target $(ENT_SCHEMA_DIR) $(filter-out $@,$(MAKECMDGOALS))
+
+.PHONY: gen.model
+gen.model:
+	ent generate $(ENT_SCHEMA_DIR)
+
 .PHONY: compile
 compile:
 	GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o spenmo cmd/api/main.go
@@ -91,3 +100,6 @@ migrate.force:
 .PHONY: validate.migration
 validate.migration:
 	bin/validate-migration.sh
+
+%:
+	@:

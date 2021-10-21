@@ -3,6 +3,8 @@ module github.com/indrasaputra/spenmo
 go 1.17
 
 require (
+	entgo.io/ent v0.9.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/cucumber/godog v0.12.1
 	github.com/golang/mock v1.4.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -36,6 +38,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.0 // indirect
 	github.com/hashicorp/go-memdb v1.3.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
